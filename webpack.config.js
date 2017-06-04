@@ -1,8 +1,8 @@
 var webpack = require('webpack');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+var path = require('path');
 
 module.exports = {
-
 	entry: {
 		'app': './src/main.ts',
 		'polyfills': [
@@ -12,19 +12,42 @@ module.exports = {
 		]
 	},
 	output: {
-		path: './dist',
+		path: path.resolve(__dirname, 'dist'),
 		filename: '[name].[hash].js'
 	},
 	module: {
 		loaders: [
-			{test: /\.component.ts$/, loader: 'ts!angular2-template'},
-			{test: /\.ts$/, exclude: /\.component.ts$/, loader: 'ts'},
-			{test: /\.html$/, loader: 'raw'},
-			{test: /\.css$/, loader: 'raw'}
+			{
+				test: /\.component.ts$/,
+				loader: 'ts!angular2-template'
+			},
+			{
+				test: /\.ts$/,
+				exclude: /\.component.ts$/,
+				loader: 'ts'
+			},
+			{
+				test: /\.html$/,
+				loader: 'raw'
+			},
+			{
+				test: /\.css|scss$/,
+				exclude: /node_modules/,
+				loaders: ['raw-loader', 'sass-loader']
+			},
+			{
+				test: /\.(woff2?|ttf|eot|svg)$/,
+				loader: 'url-loader?limit=10000'
+			},
+			{
+				test: /bootstrap-sass\/assets\/javascripts\//,
+				loader: 'imports?jQuery=jquery'
+			}
 		]
 	},
 	resolve: {
-		extensions: ['', '.js', '.ts', '.html', '.css']
+		modulesDirectories: ['node_modules', 'src'],
+		extensions: ['', '.js', '.ts', '.html', '.scss']
 	},
 	plugins: [
 		new webpack.optimize.CommonsChunkPlugin({
@@ -35,9 +58,8 @@ module.exports = {
 		}),
 		new webpack.DefinePlugin({
 			app: {
-				environment: JSON.stringify(process.env.APP_ENVIRONMENT || 'development')
+				environment: JSON.stringify(process.env.ENV || 'development')
 			}
 		})
 	]
-
 };
